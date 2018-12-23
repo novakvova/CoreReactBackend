@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using BackendCore.DAL.Entites;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -27,6 +28,9 @@ namespace BackendCore.Controllers
         {
             _userManager = userManager;
             _signInManager = signInManager;
+
+            SeederDB.SeedData(userManager);
+
         }
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody]Credentials credentials)
@@ -51,7 +55,7 @@ namespace BackendCore.Controllers
                 .PasswordSignInAsync(credentials.Email, credentials.Password,
                 false, false);
             if (!result.Succeeded)
-                return BadRequest();
+                return BadRequest(new { errors=new { form="Invalid Credentials" } });
             var user = await _userManager.FindByEmailAsync(credentials.Email);
             await _signInManager.SignInAsync(user, isPersistent: false);
             return Ok(CreateToken(user));
@@ -61,7 +65,8 @@ namespace BackendCore.Controllers
         {
             var claims = new Claim[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Id)
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+                new Claim(ClaimTypes.Name, user.UserName)
             };
 
             var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("this is the secret phrase"));

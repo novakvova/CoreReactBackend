@@ -13,7 +13,7 @@ namespace BackendCore.DAL.Entites
         public EFDbContext(DbContextOptions<EFDbContext> options)
             : base(options)
         {
-                
+               
         }
     }
 }

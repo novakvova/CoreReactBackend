@@ -33,7 +33,8 @@ namespace BackendCore
         {
             services.AddCors();
 
-            services.AddDbContext<EFDbContext>(opt => opt.UseInMemoryDatabase("user"));
+            //services.AddDbContext<EFDbContext>(opt => opt.UseInMemoryDatabase("user"));
+            services.AddDbContext<EFDbContext>(opt => opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddEntityFrameworkStores<EFDbContext>();
